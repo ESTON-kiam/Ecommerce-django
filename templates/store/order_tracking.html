@@ -1,0 +1,93 @@
+<!-- Order Tracking Template (templates/store/order_tracking.html) -->
+{% extends 'base.html' %}
+
+{% block title %}Order Tracking - EcoStore{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2><i class="fas fa-truck me-2"></i>Order Tracking</h2>
+        
+        <!-- Order Search -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5>Track Specific Order</h5>
+                <form method="GET" class="row g-3">
+                    <div class="col-md-8">
+                        <input type="text" name="order_id" class="form-control" placeholder="Enter Order ID" value="{{ request.GET.order_id|default:'' }}">
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search me-2"></i>Track Order
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Specific Order Details -->
+        {% if specific_order %}
+            <div class="order-card">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h5>Order #{{ specific_order.order_id }}</h5>
+                        <p><strong>Total:</strong> Ksh {{ specific_order.total_amount }}</p>
+                        <p><strong>Date:</strong> {{ specific_order.created_at|date:"M d, Y" }}</p>
+                        <p><strong>Shipping Address:</strong> {{ specific_order.shipping_address }}</p>
+                        <p><strong>Phone:</strong> {{ specific_order.phone_number }}</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="status-badge status-{{ specific_order.status }}">
+                            {{ specific_order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <h6 class="mt-3">Order Items:</h6>
+                {% for item in specific_order.items.all %}
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>{{ item.product.name }} x {{ item.quantity }}</span>
+                        <span>Ksh {{ item.price }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <!-- All Orders -->
+        <h4 class="mt-4">Your Orders</h4>
+        
+        {% if orders %}
+            {% for order in orders %}
+                <div class="order-card">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Order #{{ order.order_id }}</h6>
+                            <p class="mb-1"><strong>Total:</strong> Ksh {{ order.total_amount }}</p>
+                            <p class="mb-1"><strong>Date:</strong> {{ order.created_at|date:"M d, Y H:i" }}</p>
+                            <p class="mb-0"><strong>Items:</strong> {{ order.items.count }}</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <span class="status-badge status-{{ order.status }}">
+                                {{ order.get_status_display }}
+                            </span>
+                            <div class="mt-2">
+                                <a href="?order_id={{ order.order_id }}" class="btn btn-sm btn-outline-primary">
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-box-open fa-5x text-muted mb-3"></i>
+                <h4>No orders yet</h4>
+                <p class="text-muted">Start shopping to see your orders here!</p>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="fas fa-shopping-bag me-2"></i>Start Shopping
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+

@@ -163,3 +163,47 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+
+
+@csrf_protect
+@never_cache
+def login_view(request):
+    """
+    Handle user login
+    """
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            
+            login(request, user)
+           
+            return redirect('home')  
+        else:
+           
+            messages.error(request, 'Invalid username or password. Please try again.')
+    
+    return render(request, 'registration/login.html')
+
+
+def logout_view(request):
+    """
+    Handle user logout and redirect to home
+    """
+    logout(request)  
+    messages.success(request, 'You have been logged out successfully.')
+    return redirect('home')  
+
+
+
+

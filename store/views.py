@@ -7,6 +7,13 @@ from django.db.models import Q
 from .models import Product, Category, Cart, CartItem, Order, OrderItem
 from .forms import CustomUserCreationForm, CheckoutForm
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+
 def home(request):
     products = Product.objects.all().order_by('-created_at')
     categories = Category.objects.all()
@@ -163,12 +170,6 @@ def register(request):
     return render(request, 'registration/register.html', {'form': form})
 
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
 
 
 @csrf_protect
